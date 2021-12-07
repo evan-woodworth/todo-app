@@ -6,7 +6,7 @@ import useForm from '../hooks/form.js';
 export default function UserSettingsForm() {
   let settings = useContext(SettingsContext);
   const { handleChange, handleSubmit } = useForm(settings.handleSave);
-
+  console.log(settings)
   return (
     <div>
       <form onSubmit={handleSubmit}>
@@ -15,12 +15,15 @@ export default function UserSettingsForm() {
 
         <label>
           <span>Items Per Page</span>
-          <input onChange={handleChange} name="text" type="text" placeholder={`${settings.displayedItems}`} />
+          <input onChange={handleChange} name="displayedItems" type="text" placeholder={`${settings.displayedItems}`} />
         </label>
 
         <label>
           <span>Hide Completed</span>
-          <input onChange={handleChange} name="assignee" type="checkbox" placeholder={`${settings.hideComplete}`} />
+          <select onChange={handleChange} name="hideComplete" value={settings.hideComplete}>
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+          </select>
         </label>
 
         <label>
