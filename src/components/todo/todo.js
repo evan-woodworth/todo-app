@@ -13,6 +13,7 @@ const ToDo = () => {
   const [displayList, setDisplayList] = useState([]);
   const { handleChange, handleSubmit } = useForm(addItem);
   let settings = useContext(SettingsContext);
+  
   let authContext = useContext(AuthContext);
 
   function addItem(item) {
@@ -70,7 +71,7 @@ const ToDo = () => {
     }
     setDisplayList(tempList)
   }, [list, listPage]);
-
+  console.log(settings)
   return (
     <>
       <header>

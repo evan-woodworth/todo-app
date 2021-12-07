@@ -1,35 +1,45 @@
 import React, { useState, useEffect } from "react";
-import { stringify } from "uuid";
 
 export const SettingsContext = React.createContext();
 
-function Settings(props) {
+function Settings({children}) {
 
-  let [state, setState] = useState({
+  const [state, setState] = useState({
     hideComplete: true,
     displayedItems: 5,
-    sort: 'difficulty',
-    handleSave: function(values) {
-      const {hideComplete, displayedItems, sort} = values
-      let currentState = {
-        hideComplete,
-        displayedItems,
-        sort
-      }
-      localStorage.setItem('userSettings', JSON.stringify(currentState));
-    }
+    sort: 'difficulty'
   })
+
+  const handleChange = (e, values) => {
+    const { hideComplete, displayedItems, sort } = values;
+    setState({
+      hideComplete,
+      displayedItems,
+      sort
+    })
+  }
+
+  const handleSave = (e) => {
+    console.log(state)
+    localStorage.setItem('userSettings', JSON.stringify(state));
+  }
 
   useEffect(()=>{
     let userSettings = localStorage.getItem('userSettings');
     if (userSettings) {
-      setState(JSON.parse(userSettings));
+      console.log(state)
+      const { hideComplete, displayedItems, sort } = JSON.parse(userSettings);
+      setState({ hideComplete, displayedItems, sort });
     }
   }, [])
 
   return (
-    <SettingsContext.Provider value={state}>
-      {props.children}
+    <SettingsContext.Provider value={{
+        state,
+        handleChange,
+        handleSave
+      }}>
+      {children}
     </SettingsContext.Provider>
   )
 }
