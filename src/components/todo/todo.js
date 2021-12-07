@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useContext } from 'react';
 import useForm from '../../hooks/form.js';
-import {SettingsContext} from '../../context/site.js';
+import { SettingsContext } from '../../context/site.js';
+import { AuthContext } from '../../context/auth.js';
 import { v4 as uuid } from 'uuid';
-
+import Auth from '../auth/IsAuthorized';
 
 const ToDo = () => {
 
@@ -12,6 +13,7 @@ const ToDo = () => {
   const [displayList, setDisplayList] = useState([]);
   const { handleChange, handleSubmit } = useForm(addItem);
   let settings = useContext(SettingsContext);
+  let authContext = useContext(AuthContext);
 
   function addItem(item) {
     console.log(item);
@@ -21,20 +23,26 @@ const ToDo = () => {
   }
 
   function deleteItem(id) {
-    const items = list.filter( item => item.id !== id );
-    setList(items);
+
+    if (authContext.isAuthorized('delete')) {
+      const items = list.filter( item => item.id !== id );
+      setList(items);
+    }
+
   }
 
   function toggleComplete(id) {
 
-    const items = list.map( item => {
-      if ( item.id == id ) {
-        item.complete = ! item.complete;
-      }
-      return item;
-    });
-
-    setList(items);
+    if (authContext.isAuthorized('update')) {
+      const items = list.map( item => {
+        if ( item.id === id ) {
+          item.complete = ! item.complete;
+        }
+        return item;
+      });
+  
+      setList(items);
+    }
 
   }
 
@@ -69,29 +77,31 @@ const ToDo = () => {
         <h1>To Do List: {incomplete} items pending</h1>
       </header>
 
-      <form onSubmit={handleSubmit}>
+      <Auth capability='create'>
+        <form onSubmit={handleSubmit}>
 
-        <h2>Add To Do Item</h2>
+          <h2>Add To Do Item</h2>
 
-        <label>
-          <span>To Do Item</span>
-          <input onChange={handleChange} name="text" type="text" placeholder="Item Details" />
-        </label>
+          <label>
+            <span>To Do Item</span>
+            <input onChange={handleChange} name="text" type="text" placeholder="Item Details" />
+          </label>
 
-        <label>
-          <span>Assigned To</span>
-          <input onChange={handleChange} name="assignee" type="text" placeholder="Assignee Name" />
-        </label>
+          <label>
+            <span>Assigned To</span>
+            <input onChange={handleChange} name="assignee" type="text" placeholder="Assignee Name" />
+          </label>
 
-        <label>
-          <span>Difficulty</span>
-          <input onChange={handleChange} defaultValue={3} type="range" min={1} max={5} name="difficulty" />
-        </label>
+          <label>
+            <span>Difficulty</span>
+            <input onChange={handleChange} defaultValue={3} type="range" min={1} max={5} name="difficulty" />
+          </label>
 
-        <label>
-          <button type="submit">Add Item</button>
-        </label>
-      </form>
+          <label>
+            <button type="submit">Add Item</button>
+          </label>
+        </form>
+      </Auth>
 
       <div className="btn btn-secondary" onClick={e=>handlePage(e, -1)}>Last Page</div>
       <p>Page: {listPage}</p>
